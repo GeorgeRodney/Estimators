@@ -32,7 +32,6 @@ class BlackmanMethod3(Estimator):
         if (True == self.oosm):
 
             self.He = self.H @ F
-            return
 
         self.x_ = F @ self.x
         self.P_ = F @ self.P @ F.T + Q
@@ -45,14 +44,14 @@ class BlackmanMethod3(Estimator):
             self.y = z - self.He @ self.x
 
             # Gain calcs
-            self.S = self.He @ self.P @ self.He.T + R
-            self.K = self.P @ self.He.T @ np.linalg.inv(self.S)
+            self.S = self.He @ self.P_ @ self.He.T + R
+            self.K = self.P_ @ self.He.T @ np.linalg.inv(self.S)
 
             # Update the State [Mean and Covariance]
             self.x = self.x + self.K @ self.y
 
             I = np.eye(self.P.shape[0])
-            self.P = (I - self.K @ self.He) @ self.P @ (I - self.K @ self.He).T + self.K @ R @ self.K.T
+            self.P = (I - self.K @ self.He) @ self.P_ @ (I - self.K @ self.He).T + self.K @ R @ self.K.T
 
             # Rest oosm flag
             self.oosm = False

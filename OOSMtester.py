@@ -71,7 +71,7 @@ P_0 = np.array([[P00, 0, 0, 0],
 
 # Tuned
 alpha = 0.048331112463383605
-alpha = 0.001
+# alpha = 0.001
 
 t0 = 0
 t_prev = 0
@@ -94,7 +94,7 @@ estimated_P00.append(P00)
 # STEP 1: Select Estimator Method
 # Define the Estimator (BASELINE, BLACKMAN3, BLACKMAN4, SIMON)
 state = estUtils.FilterMethod.BASELINE
-# state = estUtils.FilterMethod.BLACKMAN3
+state = estUtils.FilterMethod.BLACKMAN3
 
 # STEP 3: Select IN SEQUENE or OUT OF SEQUENCE
 # Define the sequence method (NOOOSM, OOSM)
