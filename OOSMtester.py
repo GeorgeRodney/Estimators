@@ -7,7 +7,7 @@ import BlackmanMethod4 as bm4
 import XYStepper as vid
 
 # Number of samples!
-N = 5 * 1e1
+N = 100
 
 # Process noise function
 def Q_dt(t, sigma_a):
@@ -51,6 +51,7 @@ for o in range(len(t)):
     zt = np.vstack((z, [[t[o]]]))
     obs.append(zt)
 
+# print(obs)
 # Define the initial state vector
 x0 = obs[0]
 x0 = x0[:2]
@@ -69,8 +70,8 @@ P_0 = np.array([[P00, 0, 0, 0],
                [0, 0, 0, P11]])
 
 # Tuned
-# alpha = 0.09056987856157933
-alpha = 10
+alpha = 0.048331112463383605
+alpha = 0.001
 
 t0 = 0
 t_prev = 0
@@ -90,10 +91,12 @@ estPos = []
 predicted_P00.append(P00)
 estimated_P00.append(P00)
 
+# STEP 1: Select Estimator Method
 # Define the Estimator (BASELINE, BLACKMAN3, BLACKMAN4, SIMON)
 state = estUtils.FilterMethod.BASELINE
 # state = estUtils.FilterMethod.BLACKMAN3
 
+# STEP 3: Select IN SEQUENE or OUT OF SEQUENCE
 # Define the sequence method (NOOOSM, OOSM)
 doOOSM = estUtils.SequenceMethod.NOOOSM
 # doOOSM = estUtils.SequenceMethod.OOSM
@@ -108,13 +111,16 @@ elif (estUtils.FilterMethod.BLACKMAN3 == state):
 if (estUtils.SequenceMethod.OOSM == doOOSM):
     obs = estUtils.convertToOOSM(obs)
 
-for ii in range(len(obs) - 1):
+# print(obs)
 
+for ii in range(int(N)-1):
+
+    idxIgnore0 = ii + 1
     # Pull time and location apart
-    z = obs[ii+1]
+    z = obs[idxIgnore0]
     z = z[:2]
     
-    t_current = float(obs[ii+1][2,0])
+    t_current = float(obs[idxIgnore0][2,0])
     dt = t_current - t_prev
 
     Q = Q_dt(dt, alpha)
@@ -138,7 +144,7 @@ for ii in range(len(obs) - 1):
     estimated_P00.append(P[0][0])
     predicted_P00.append(P_[0][0])
     # Calculate NEES
-    t = truth[ii]
+    t = truth[idxIgnore0]
     x = estimator_.get_estState()
     e = t - x
     NEES.append( (e.T @ np.linalg.inv(P) @ e)[0,0] )
@@ -170,7 +176,7 @@ estPos = np.array(estPos)
 fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(10,8))
 
 # Plot Normalized Estiamted Error Squared
-axs[0,0].plot(NEES, label="NEES", ls='dotted')
+axs[0,0].plot(NEES, label="NEES", linewidth='0.1', marker='.')
 axs[0,0].axhline(11.143, color='r', ls='--', lw=1, label='95% Confidence Interval')
 axs[0,0].axhline(4, color='k', ls='--', lw=1, label='E[NEES]=4')
 axs[0,0].axhline(0.484, color='r', ls='--', lw=1)
@@ -180,8 +186,8 @@ axs[0,0].set_title("NEES")
 axs[0,0].legend()
 
 # Plot Estiamte Covariance Position Element
-axs[1,0].plot(estP00, label='Estimated P00', ls='dotted', color='red')
-axs[1,0].plot(predP00, label='Predicted P00', ls='dotted', color='blue')
+axs[1,0].plot(estP00, label='Estimated P00', linewidth='0.1', marker='.', color='red')
+axs[1,0].plot(predP00, label='Predicted P00', linewidth='0.1', marker='.', color='blue')
 axs[1,0].set_xlabel('Iterations')
 axs[1,0].set_title('Estimated P00')
 axs[1,0].legend()
@@ -195,13 +201,13 @@ axs[0,2].set_title('Filter Behavior')
 axs[0,2].legend()
 
 # Plot the Position Kalman Gain Term
-axs[0,1].plot(posK, label='K pos', ls='dotted', color='red')
+axs[0,1].plot(posK, label='K pos', linewidth='0.1', marker='.', color='red')
 axs[0,1].set_xlabel('Iterations')
 axs[0,1].set_title('Kalman Gain Velocity')
 axs[0,1].legend()
 
 # Plot the Velocity Kalman Gain Term
-axs[1,1].plot(velK, label='K vel', ls='dotted', color='blue')
+axs[1,1].plot(velK, label='K vel', linewidth='0.1', marker='.', color='blue')
 axs[1,1].set_xlabel('Iterations')
 axs[1,1].set_title('Kalman Gain Velocity')
 axs[1,1].legend()
