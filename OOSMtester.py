@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import Estimator as est
-#  BOC - add assoc function
-#  import EstimatorUtils as estUtils
 import EstimatorUtils as estUtils
 import BlackmanMethod3 as bm3
 import BlackmanMethod4 as bm4
@@ -93,7 +91,6 @@ estPos = []
 predicted_P00.append(P00)
 estimated_P00.append(P00)
 
-# BOC - for association
 associationBoolList = []
 associationValList = []
 
@@ -165,7 +162,6 @@ for ii in range(int(N)-1):
     truPos.append(t[:2])
     estPos.append(x[:2])
 
-    # BOC - mahal dist
     # Did we associate?
     S = estimator_.get_S()
     associationBool, associationVal = estUtils.isAssociation(x[:2], z, S)
@@ -186,7 +182,6 @@ velK = np.array(vel_K)
 measPos = np.array(measPos)
 truPos = np.array(truPos)
 estPos = np.array(estPos)
-# BOC - association bool list
 associationBoolList = np.array(associationBoolList)
 associationValList = np.array(associationValList)
 
@@ -229,7 +224,6 @@ axs[1,1].set_xlabel('Iterations')
 axs[1,1].set_title('Kalman Gain Velocity')
 axs[1,1].legend()
 
-# BOC - association bool list
 axs[1,2].plot(associationValList, label='Mahalanobis distance', linewidth='0.1', marker='.', color='blue')
 axs[1,2].set_xlabel('Iterations')
 axs[1,2].set_title('Mahalanobis distance per iteration')

@@ -1,7 +1,7 @@
 import numpy as np
 from enum import Enum, auto
 
-ASSOCIATION_THRESHOLD = 10
+ASSOCIATION_THRESHOLD = 3
 
 # Function: isAssociation
 #   - Uses mahalanobis distance to determine if an association was made or not
