@@ -22,7 +22,7 @@ def move_element(a, i, j):
 def convertToOOSM(obs):
     obs_OOSM = list(obs)
     n = len(obs_OOSM)
-    interval = 5
+    interval = 3
 
     for idx in range(0, n, interval):
         if idx > 0:
