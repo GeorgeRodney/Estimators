@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import Estimator as est
+#  BOC - add assoc function
+#  import EstimatorUtils as estUtils
 import EstimatorUtils as estUtils
 import BlackmanMethod3 as bm3
 import BlackmanMethod4 as bm4
@@ -91,10 +93,15 @@ estPos = []
 predicted_P00.append(P00)
 estimated_P00.append(P00)
 
+# BOC - for association
+associationBoolList = []
+associationValList = []
+
 # STEP 1: Select Estimator Method
 # Define the Estimator (BASELINE, BLACKMAN3, BLACKMAN4, SIMON)
 state = estUtils.FilterMethod.BASELINE
 # state = estUtils.FilterMethod.BLACKMAN3
+
 
 # STEP 3: Select IN SEQUENE or OUT OF SEQUENCE
 # Define the sequence method (NOOOSM, OOSM)
@@ -158,6 +165,13 @@ for ii in range(int(N)-1):
     truPos.append(t[:2])
     estPos.append(x[:2])
 
+    # BOC - mahal dist
+    # Did we associate?
+    S = estimator_.get_S()
+    associationBool, associationVal = estUtils.isAssociation(x[:2], z, S)
+    associationBoolList.append(associationBool)
+    associationValList.append(associationVal)
+
 
 # Scale the process noise
 nees_u = np.mean(NEES)
@@ -172,6 +186,9 @@ velK = np.array(vel_K)
 measPos = np.array(measPos)
 truPos = np.array(truPos)
 estPos = np.array(estPos)
+# BOC - association bool list
+associationBoolList = np.array(associationBoolList)
+associationValList = np.array(associationValList)
 
 fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(10,8))
 
@@ -211,6 +228,12 @@ axs[1,1].plot(velK, label='K vel', linewidth='0.1', marker='.', color='blue')
 axs[1,1].set_xlabel('Iterations')
 axs[1,1].set_title('Kalman Gain Velocity')
 axs[1,1].legend()
+
+# BOC - association bool list
+axs[1,2].plot(associationValList, label='Mahalanobis distance', linewidth='0.1', marker='.', color='blue')
+axs[1,2].set_xlabel('Iterations')
+axs[1,2].set_title('Mahalanobis distance per iteration')
+axs[1,2].legend()
 
 fig.tight_layout()
 plt.show()

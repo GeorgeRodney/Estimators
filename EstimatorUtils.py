@@ -1,5 +1,17 @@
-
+import numpy as np
 from enum import Enum, auto
+
+ASSOCIATION_THRESHOLD = 10
+
+# Function: isAssociation
+#   - Uses mahalanobis distance to determine if an association was made or not
+# Inputs:
+#   - x: a vector location of point 1
+#   - y: a vector location of point 2
+#   - p: semi-definite covariance matrix
+def isAssociation(x, y, p):
+    d = np.sqrt((x - y).T @ np.linalg.inv(p) @ (x - y))
+    return d[0] < ASSOCIATION_THRESHOLD, d[0]
 
 def move_element(a, i, j):
     a = list(a)
