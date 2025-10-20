@@ -10,8 +10,8 @@ from Estimator import Estimator
 
 class BlackmanMethod3(Estimator):
 
-    def __init__ (self, x, P):
-        super().__init__(x, P)
+    def __init__ (self, x, P, R):
+        super().__init__(x, P, R)
         self.y = 0
         
         self.He = np.array([[1, 0, 0, 0],
@@ -35,23 +35,28 @@ class BlackmanMethod3(Estimator):
 
         self.x_ = F @ self.x
         self.P_ = F @ self.P @ F.T + Q
+        self.S = self.He @ self.P_ @ self.He.T + self.R
 
-    def update(self, z, R, oosm):
+    def update(self, z, oosm):
         self.oosm = oosm
+
+        if (False == self.didAssociate):
+            self.x = self.x_
+            self.P = self.P_
+            return
 
         if (True == self.oosm):
             # Innovation
             self.y = z - self.He @ self.x
 
             # Gain calcs
-            self.S = self.He @ self.P_ @ self.He.T + R
             self.K = self.P_ @ self.He.T @ np.linalg.inv(self.S)
 
             # Update the State [Mean and Covariance]
             self.x = self.x + self.K @ self.y
 
             I = np.eye(self.P.shape[0])
-            self.P = (I - self.K @ self.He) @ self.P_ @ (I - self.K @ self.He).T + self.K @ R @ self.K.T
+            self.P = (I - self.K @ self.He) @ self.P_ @ (I - self.K @ self.He).T + self.K @ self.R @ self.K.T
 
             # Rest oosm flag
             self.oosm = False
@@ -62,14 +67,13 @@ class BlackmanMethod3(Estimator):
             self.y = z - self.H @ self.x_
 
             # Gain Calcs
-            self.S = self.H @ self.P_ @ self.H.T + R
             self.K = self.P_ @ self.H.T @ np.linalg.inv(self.S)
 
             # Update the State [Mean and Covariance]
             self.x = self.x_ + self.K @ self.y
 
             I = np.eye(self.P.shape[0])
-            self.P = (I - self.K @ self.H) @ self.P_ @ (I - self.K @ self.H).T + self.K @ R @ self.K.T
+            self.P = (I - self.K @ self.H) @ self.P_ @ (I - self.K @ self.H).T + self.K @ self.R @ self.K.T
 
         else:
             raise ValueError('Something broke in update.')

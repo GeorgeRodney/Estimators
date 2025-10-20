@@ -72,6 +72,7 @@ P_0 = np.array([[P00, 0, 0, 0],
 # Tuned
 alpha = 0.048331112463383605
 # alpha = 0.001
+# alpha = 10
 
 t0 = 0
 t_prev = 0
@@ -99,14 +100,14 @@ state = estUtils.FilterMethod.BLACKMAN3
 # STEP 3: Select IN SEQUENE or OUT OF SEQUENCE
 # Define the sequence method (NOOOSM, OOSM)
 doOOSM = estUtils.SequenceMethod.NOOOSM
-# doOOSM = estUtils.SequenceMethod.OOSM
+doOOSM = estUtils.SequenceMethod.OOSM
 
 # Instantiate the Estimator
 if (estUtils.FilterMethod.BASELINE == state):
-    estimator_ = est.Estimator(x_0, P_0)
+    estimator_ = est.Estimator(x_0, P_0, R)
 
 elif (estUtils.FilterMethod.BLACKMAN3 == state):
-    estimator_ = bm3.BlackmanMethod3(x_0, P_0)
+    estimator_ = bm3.BlackmanMethod3(x_0, P_0, R)
 
 if (estUtils.SequenceMethod.OOSM == doOOSM):
     obs = estUtils.convertToOOSM(obs)
@@ -131,7 +132,7 @@ for ii in range(int(N)-1):
         isOOSM = False
 
     estimator_.predict(dt, Q, isOOSM)
-    estimator_.update(z, R, isOOSM)
+    estimator_.update(z, isOOSM)
 
     # Save off current time
     if (False == isOOSM):

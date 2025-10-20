@@ -28,3 +28,9 @@ class FilterMethod(Enum):
 class SequenceMethod(Enum):
     NOOOSM = auto()
     OOSM = auto()
+
+# def threeSigmaCheck(z, x_ S):
+#     # Stefan if you could implement a mahalanobis distance check and then return true if 
+#     # within 3 sigma.Then verify that the state coasts when this is false.
+#     withinGate = True
+#     return withinGate
