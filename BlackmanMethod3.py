@@ -28,14 +28,16 @@ class BlackmanMethod3(Estimator):
                       [0, 1, 0, t],
                       [0, 0, 1, 0],
                       [0, 0, 0, 1]])
-
-        if (True == self.oosm):
-
-            self.He = self.H @ F
-
+        
         self.x_ = F @ self.x
         self.P_ = F @ self.P @ F.T + Q
-        self.S = self.He @ self.P_ @ self.He.T + self.R
+
+        if (True == self.oosm):
+            self.He = self.H @ F
+            self.S = self.He @ self.P_ @ self.He.T + self.R
+
+        elif (False == self.oosm):
+            self.S = self.H @ self.P_ @ self.H.T + self.R
 
     def update(self, z, oosm):
         self.oosm = oosm
