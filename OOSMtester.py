@@ -93,10 +93,14 @@ predicted_P00.append(P00)
 estimated_P00.append(P00)
 oosmStamp = []
 
+associationBoolList = []
+associationValList = []
+
 # STEP 1: Select Estimator Method
 # Define the Estimator (BASELINE, BLACKMAN3, BLACKMAN4, SIMON)
 state = estUtils.FilterMethod.BASELINE
 state = estUtils.FilterMethod.BLACKMAN3
+
 
 # STEP 3: Select IN SEQUENE or OUT OF SEQUENCE
 # Define the sequence method (NOOOSM, OOSM)
@@ -161,6 +165,12 @@ for ii in range(int(N)-1):
     estPos.append(x[:2])
     oosmStamp.append(isOOSM)
 
+    # Did we associate?
+    S = estimator_.get_S()
+    associationBool, associationVal = estUtils.isAssociation(x[:2], z, S)
+    associationBoolList.append(associationBool)
+    associationValList.append(associationVal)
+
 
 # Scale the process noise
 nees_u = np.mean(Nees)
@@ -175,6 +185,9 @@ velK = np.array(vel_K)
 measPos = np.array(measPos)
 truPos = np.array(truPos)
 estPos = np.array(estPos)
+associationBoolList = np.array(associationBoolList)
+associationValList = np.array(associationValList)
+
 #Log the oosm frames
 oosmStamp = np.array(oosmStamp)
 oosm_idx = np.where(oosmStamp)[0]
@@ -222,6 +235,11 @@ axs[1,1].plot(velK, label='K vel', linewidth='0.1', marker='.', color='blue')
 axs[1,1].set_xlabel('Iterations')
 axs[1,1].set_title('Kalman Gain Velocity')
 axs[1,1].legend()
+
+axs[1,2].plot(associationValList, label='Mahalanobis distance', linewidth='0.1', marker='.', color='blue')
+axs[1,2].set_xlabel('Iterations')
+axs[1,2].set_title('Mahalanobis distance per iteration')
+axs[1,2].legend()
 
 fig.tight_layout()
 plt.show()

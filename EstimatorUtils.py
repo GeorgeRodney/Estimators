@@ -1,5 +1,17 @@
-
+import numpy as np
 from enum import Enum, auto
+
+ASSOCIATION_THRESHOLD = 3
+
+# Function: isAssociation
+#   - Uses mahalanobis distance to determine if an association was made or not
+# Inputs:
+#   - x: a vector location of point 1
+#   - y: a vector location of point 2
+#   - p: semi-definite covariance matrix
+def isAssociation(x, y, p):
+    d = np.sqrt((x - y).T @ np.linalg.inv(p) @ (x - y))
+    return d[0] < ASSOCIATION_THRESHOLD, d[0]
 
 def move_element(a, i, j):
     a = list(a)
@@ -28,9 +40,3 @@ class FilterMethod(Enum):
 class SequenceMethod(Enum):
     NOOOSM = auto()
     OOSM = auto()
-
-# def threeSigmaCheck(z, x_ S):
-#     # Stefan if you could implement a mahalanobis distance check and then return true if 
-#     # within 3 sigma.Then verify that the state coasts when this is false.
-#     withinGate = True
-#     return withinGate
