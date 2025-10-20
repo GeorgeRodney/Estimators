@@ -43,6 +43,10 @@ class BlackmanMethod3(Estimator):
         self.oosm = oosm
 
         if (False == self.didAssociate):
+
+            if (True == self.oosm):
+                return
+            
             self.x = self.x_
             self.P = self.P_
             return

@@ -63,7 +63,7 @@ R = np.array([[sigma**2, 0],
 
 beta = 3
 P00 = beta * R[0][0]
-P11 = 0.3**2
+P11 = 0.9**2
 P_0 = np.array([[P00, 0, 0, 0],
                [0, P00, 0, 0],
                [0, 0, P11, 0], 
@@ -81,7 +81,7 @@ t_current = 0
 isOOSM = False
 prevOOSM = False
 
-NEES = []
+Nees = []
 estimated_P00 = []
 predicted_P00 = []
 pos_K = []
@@ -91,6 +91,7 @@ measPos = []
 estPos = []
 predicted_P00.append(P00)
 estimated_P00.append(P00)
+oosmStamp = []
 
 # STEP 1: Select Estimator Method
 # Define the Estimator (BASELINE, BLACKMAN3, BLACKMAN4, SIMON)
@@ -148,7 +149,7 @@ for ii in range(int(N)-1):
     t = truth[idxIgnore0]
     x = estimator_.get_estState()
     e = t - x
-    NEES.append( (e.T @ np.linalg.inv(P) @ e)[0,0] )
+    Nees.append( (e.T @ np.linalg.inv(P) @ e)[0,0] )
     # Kalman gain calcs
     pos_K.append(np.sqrt(K[0][0]**2 + K[1][1]**2))
     vel_K.append(np.sqrt(K[2][0]**2 + K[3][1]**2))
@@ -158,10 +159,11 @@ for ii in range(int(N)-1):
     measPos.append(z)
     truPos.append(t[:2])
     estPos.append(x[:2])
+    oosmStamp.append(isOOSM)
 
 
 # Scale the process noise
-nees_u = np.mean(NEES)
+nees_u = np.mean(Nees)
 alpha_new = alpha * np.sqrt(nees_u / DOF)
 print(f'alpha_new: {alpha_new}')
 
@@ -173,14 +175,20 @@ velK = np.array(vel_K)
 measPos = np.array(measPos)
 truPos = np.array(truPos)
 estPos = np.array(estPos)
+#Log the oosm frames
+oosmStamp = np.array(oosmStamp)
+oosm_idx = np.where(oosmStamp)[0]
+print(oosm_idx)
+print(obs)
 
 fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(10,8))
 
 # Plot Normalized Estiamted Error Squared
-axs[0,0].plot(NEES, label="NEES", linewidth='0.1', marker='.')
+axs[0,0].plot(Nees, label="NEES", linewidth='0.1', marker='.')
 axs[0,0].axhline(11.143, color='r', ls='--', lw=1, label='95% Confidence Interval')
 axs[0,0].axhline(4, color='k', ls='--', lw=1, label='E[NEES]=4')
 axs[0,0].axhline(0.484, color='r', ls='--', lw=1)
+# axs[0,0].scatter(oosm_idx, Nees[oosm_idx], marker='*', color='orange', s=30, label='OOSM Frames')
 axs[0,0].set_xlabel("Time step k")
 axs[0,0].set_ylabel("NEES")
 axs[0,0].set_title("NEES")
@@ -188,7 +196,9 @@ axs[0,0].legend()
 
 # Plot Estiamte Covariance Position Element
 axs[1,0].plot(estP00, label='Estimated P00', linewidth='0.1', marker='.', color='red')
+axs[1,0].scatter(oosm_idx, estP00[oosm_idx], marker='*', color='orange', s=30, label='OOSM Frames')
 axs[1,0].plot(predP00, label='Predicted P00', linewidth='0.1', marker='.', color='blue')
+axs[1,0].scatter(oosm_idx, predP00[oosm_idx], marker='*', color='orange', s=30)
 axs[1,0].set_xlabel('Iterations')
 axs[1,0].set_title('Estimated P00')
 axs[1,0].legend()
