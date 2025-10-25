@@ -46,8 +46,7 @@ class Estimator:
     def associate(self, z):
         
         # Hook up this function stefan
-        # self.didAssociate = threeSigmaCheck(z, self.x_, self.S)
-        self.didAssociate = True
+        self.didAssociate = EstimatorUtils.threeSigmaCheck(z, self.H @ self.x_, self.S)
             
 
     def update(self, z, oosm):
@@ -90,3 +89,9 @@ class Estimator:
     
     def get_y(self):
         return self.y
+    
+    def get_didAssoc(self):
+        return self.didAssociate
+    
+    def get_predTrackLocation(self):
+        return self.H @ self.x_

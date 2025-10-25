@@ -1,5 +1,6 @@
 
 from enum import Enum, auto
+import numpy as np
 
 def move_element(a, i, j):
     a = list(a)
@@ -10,7 +11,7 @@ def move_element(a, i, j):
 def convertToOOSM(obs):
     obs_OOSM = list(obs)
     n = len(obs_OOSM)
-    interval = 3
+    interval = 5
 
     for idx in range(0, n, interval):
         if idx > 0:
@@ -29,8 +30,17 @@ class SequenceMethod(Enum):
     NOOOSM = auto()
     OOSM = auto()
 
-# def threeSigmaCheck(z, x_ S):
+def threeSigmaCheck(z, x_, S):
 #     # Stefan if you could implement a mahalanobis distance check and then return true if 
 #     # within 3 sigma.Then verify that the state coasts when this is false.
 #     withinGate = True
 #     return withinGate
+    delta = z - x_
+    d2 = delta.T @ np.linalg.inv(S) @ delta
+
+    if d2 <= 9:
+        # print(f"Passed Assoc with d2 = {d2}.")
+        return True
+    else:
+        # print(f"Failed Assoc with d2 = {d2}.")
+        return False
