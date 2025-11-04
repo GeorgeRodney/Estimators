@@ -1,6 +1,5 @@
 import numpy as np
-from abc import ABC, abstractmethod
-import Estimator
+from Estimator import Estimator
 
 # >-----------------------------------------------------
 #   Function    :   Simon
@@ -14,11 +13,10 @@ class Simon(Estimator):
 
     def __init__ (self, x, P, R):
         super().__init__(x, P, R)
+
         self.y = 0
-        
         self.oosm = False
         
-
     def predict(self, dt, Q, oosm):
         self.oosm = oosm
 
@@ -31,12 +29,6 @@ class Simon(Estimator):
         self.x_ = F @ self.x
         self.P_ = F @ self.P @ F.T + Q
 
-        if (True == self.oosm):
-            self.He = self.H @ F
-            self.S = self.He @ self.P_ @ self.He.T + self.R
-
-        elif (False == self.oosm):
-            self.S = self.H @ self.P_ @ self.H.T + self.R
 
     def update(self, z, oosm):
         self.oosm = oosm
@@ -50,35 +42,14 @@ class Simon(Estimator):
             self.P = self.P_
             return
 
-        if (True == self.oosm):
-            # Innovation
-            self.y = z - self.He @ self.x
+        # Innovation
+        self.y = z - self.H @ self.x_
 
-            # Gain calcs
-            self.K = self.P_ @ self.He.T @ np.linalg.inv(self.S)
+        # Gain Calcs
+        self.K = self.P_ @ self.H.T @ np.linalg.inv(self.S)
 
-            # Update the State [Mean and Covariance]
-            self.x = self.x + self.K @ self.y
+        # Update the State [Mean and Covariance]
+        self.x = self.x_ + self.K @ self.y
 
-            I = np.eye(self.P.shape[0])
-            self.P = (I - self.K @ self.He) @ self.P_ @ (I - self.K @ self.He).T + self.K @ self.R @ self.K.T
-
-            # Rest oosm flag
-            self.oosm = False
-
-        elif (False == self.oosm):
-
-            # Innovation
-            self.y = z - self.H @ self.x_
-
-            # Gain Calcs
-            self.K = self.P_ @ self.H.T @ np.linalg.inv(self.S)
-
-            # Update the State [Mean and Covariance]
-            self.x = self.x_ + self.K @ self.y
-
-            I = np.eye(self.P.shape[0])
-            self.P = (I - self.K @ self.H) @ self.P_ @ (I - self.K @ self.H).T + self.K @ self.R @ self.K.T
-
-        else:
-            raise ValueError('Something broke in update.')
+        I = np.eye(self.P.shape[0])
+        self.P = (I - self.K @ self.H) @ self.P_ @ (I - self.K @ self.H).T + self.K @ self.R @ self.K.T

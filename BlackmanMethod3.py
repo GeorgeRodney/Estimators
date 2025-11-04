@@ -12,13 +12,11 @@ class BlackmanMethod3(Estimator):
 
     def __init__ (self, x, P, R):
         super().__init__(x, P, R)
-        self.y = 0
         
+        self.y = 0
         self.He = np.array([[1, 0, 0, 0],
                            [0, 1, 0, 0]])
-        
         self.oosm = False
-        
 
     def predict(self, dt, Q, oosm):
         self.oosm = oosm

@@ -5,9 +5,10 @@ import EstimatorUtils as estUtils
 import BlackmanMethod3 as bm3
 import BlackmanMethod4 as bm4
 import XYStepper as vid
+import Simon as si
 
 # Number of samples!
-N = 16
+N = 75
 
 # Process noise function
 def Q_dt(t, sigma_a):
@@ -113,12 +114,13 @@ oosmStamp.append(0)
 # STEP 1: Select Estimator Method
 # Define the Estimator (BASELINE, BLACKMAN3, BLACKMAN4, SIMON)
 state = estUtils.FilterMethod.BASELINE
-state = estUtils.FilterMethod.BLACKMAN3
+# state = estUtils.FilterMethod.BLACKMAN3
+# state = estUtils.FilterMethod.SIMON
 
 # STEP 3: Select IN SEQUENE or OUT OF SEQUENCE
 # Define the sequence method (NOOOSM, OOSM)
 doOOSM = estUtils.SequenceMethod.NOOOSM
-doOOSM = estUtils.SequenceMethod.OOSM
+# doOOSM = estUtils.SequenceMethod.OOSM
 
 # Instantiate the Estimator
 if (estUtils.FilterMethod.BASELINE == state):
@@ -126,6 +128,9 @@ if (estUtils.FilterMethod.BASELINE == state):
 
 elif (estUtils.FilterMethod.BLACKMAN3 == state):
     estimator_ = bm3.BlackmanMethod3(x_0, P_0, R)
+
+elif (estUtils.FilterMethod.SIMON == state):
+    estimator_ = si.Simon(x_0, P_0, R)
 
 if (estUtils.SequenceMethod.OOSM == doOOSM):
     obs = estUtils.convertToOOSM(obs)
