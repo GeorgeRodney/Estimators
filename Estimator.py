@@ -43,10 +43,10 @@ class Estimator:
         self.P_ = F @ self.P @ F.T + Q
         self.S = self.H @ self.P_ @ self.H.T + self.R
 
-    def associate(self, z):
+    # def associate(self, z):
         
         # Hook up this function stefan
-        self.didAssociate = EstimatorUtils.threeSigmaCheck(z, self.H @ self.x_, self.S)
+        # self.didAssociate = EstimatorUtils.threeSigmaCheck(z, self.H @ self.x_, self.S)
             
 
     def update(self, z, oosm):

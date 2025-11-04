@@ -21,7 +21,7 @@ class XYStepper:
     """
 
     def __init__(self,
-                 truPos, measPos, estPos,
+                 truPos, measPos, estPos, measTime,
                  title: str = "Filter Behavior (XY Stepper)",
                  tail_len: int = 25,
                  show_tails: bool = True):
@@ -29,6 +29,7 @@ class XYStepper:
         self.tru = np.asarray(truPos, dtype=float).reshape(-1, 2)
         self.meas = np.asarray(measPos, dtype=float).reshape(-1, 2)
         self.est = np.asarray(estPos, dtype=float).reshape(-1, 2)
+        self.measTime = np.asarray(measTime, dtype=float).reshape(-1, 1)
 
         # length sanity (use min length to avoid index errors)
         self.N = min(len(self.tru), len(self.meas), len(self.est))
@@ -109,6 +110,7 @@ class XYStepper:
             return "nan" if np.isnan(x) else f"{x:.3f}"
 
         self.text.set_text(
+            f"Time= ({fmt(self.measTime[self.k,0])})\n"
             f"k = {self.k+1}/{self.N}\n"
             f"Truth   = ({fmt(self.tru[self.k,0])}, {fmt(self.tru[self.k,1])})\n"
             f"Measured= ({fmt(self.meas[self.k,0])}, {fmt(self.meas[self.k,1])})\n"
