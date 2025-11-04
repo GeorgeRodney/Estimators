@@ -16,6 +16,9 @@ class Simon(Estimator):
 
         self.y = 0
         self.oosm = False
+        self.Pw = np.eye(self.P.shape[0])
+        self.Pxw = np.eye(self.P.shape[0])
+        self.retroP = np.eye(self.P.shape[0])
         
     def predict(self, dt, Q, oosm):
         self.oosm = oosm
@@ -25,11 +28,22 @@ class Simon(Estimator):
                       [0, 1, 0, t],
                       [0, 0, 1, 0],
                       [0, 0, 0, 1]])
+
+        # Retrodict from time k to k0
+        if (True == oosm):
+            # Retrodict and remove the previous residual info
+            self.S = self.H @ self.P_ @ self.H.T + self.R
+            self.x_ = F @ ( self.x - Q @ self.H.T @ np.linalg.inv(self.S) @ self.y) # Equation (10.118)
+
+            # Compute the covariance of the retrodicted state
+            self.Pw = Q - Q @ self.H.T @ np.linalg.inv(self.S) @ self.H @ Q # Equations (10.122)
+            self.Pxw = Q - self.P_ @ self.H.T @ np.linalg.inv(self.S) @ self.H @ Q # Equations (10.122)
+            return 
         
+        # Predict
         self.x_ = F @ self.x
         self.P_ = F @ self.P @ F.T + Q
-
-
+            
     def update(self, z, oosm):
         self.oosm = oosm
 
