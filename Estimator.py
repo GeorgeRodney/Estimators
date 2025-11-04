@@ -59,6 +59,7 @@ class Estimator:
 
         # Innovation
         self.y = z -  self.H @ self.x_
+        print(np.linalg.norm(self.y))
 
         # Statistics
         self.K = self.P_ @ self.H.T @ np.linalg.inv(self.S)
