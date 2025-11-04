@@ -20,6 +20,7 @@ class Simon(Estimator):
         self.retroP = np.eye(self.P.shape[0])
         self.retroS = np.eye(self.S.shape[0])
         self.retroPxy = np.eye(self.P.shape[0])
+        self.retroK = np.eye(self.K.shape[0])
         
     def predict(self, dt, Q, oosm):
         self.oosm = oosm
@@ -32,7 +33,7 @@ class Simon(Estimator):
         # print(oosm)
 
         # Retrodict from time k to k0
-        if (True == oosm):
+        if (True == self.oosm):
             # Retrodict and remove the previous residual info
             self.S = self.H @ self.P_ @ self.H.T + self.R
             self.x_ = F @ ( self.x - Q @ self.H.T @ np.linalg.inv(self.S) @ self.y) # Equation (10.118 / 10.128)
@@ -46,7 +47,7 @@ class Simon(Estimator):
             self.retroS = self.H @ self.retroP @ self.H.T + self.R # Equation (10.130)
 
             # Compute the covariance between state at time k and measurement at time k0
-            self.retroPxy = ( self.P - self.Pxw ) @ F.T @ self.H # Equation (10.131)
+            self.retroPxy = ( self.P - self.Pxw ) @ F.T @ self.H.T # Equation (10.131)
 
         else:
             # Predict
@@ -66,11 +67,15 @@ class Simon(Estimator):
             self.P = self.P_
             return
 
-        if (True == oosm):
+        if (True == self.oosm):
             
             # Compute updated state x^{^}(k | k0)
             self.x = self.x + self.retroPxy @ np.linalg.inv(self.retroS) @ ( z - self.H @ self.x_ ) # Equations (10.132)
             self.P = self.P - self.retroPxy @ np.linalg.inv(self.retroS) @ self.retroPxy.T # Equations (10.132)
+
+            # For performance reasons I want the retrodicted innovation kalman gain K
+            # The value is implicit in the above simon equations
+            self.retroK = self.retroPxy @ np.linalg.inv(self.retroS)
 
         else:
             # Innovation
@@ -85,3 +90,28 @@ class Simon(Estimator):
 
             I = np.eye(self.P.shape[0])
             self.P = (I - self.K @ self.H) @ self.P_ @ (I - self.K @ self.H).T + self.K @ self.R @ self.K.T
+
+    # Override baseline getters
+    def get_predP(self):
+
+        if (True == self.oosm):
+            return self.retroP
+        
+        else:
+            return self.P_
+        
+    def get_K(self):
+        
+        if (True == self.oosm):
+            return self.retroK
+        
+        else:
+            return self.K
+        
+    def get_S(self):
+
+        if (True == self.oosm):
+            return self.retroS
+        
+        else:
+            return self.S

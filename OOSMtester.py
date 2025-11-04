@@ -8,7 +8,7 @@ import XYStepper as vid
 import Simon as si
 
 # Number of samples!
-N = 100
+N = 45
 
 # Process noise function
 def Q_dt(t, sigma_a):
@@ -120,7 +120,7 @@ state = estUtils.FilterMethod.SIMON
 # STEP 3: Select IN SEQUENE or OUT OF SEQUENCE
 # Define the sequence method (NOOOSM, OOSM)
 doOOSM = estUtils.SequenceMethod.NOOOSM
-# doOOSM = estUtils.SequenceMethod.OOSM
+doOOSM = estUtils.SequenceMethod.OOSM
 
 # Instantiate the Estimator
 if (estUtils.FilterMethod.BASELINE == state):
