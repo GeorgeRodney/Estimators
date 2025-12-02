@@ -8,7 +8,7 @@ import XYStepper as vid
 import Simon as si
 
 # Number of samples!
-N = 45
+N = 64
 
 # Process noise function
 def Q_dt(t, sigma_a):
@@ -78,7 +78,7 @@ x_0 = np.vstack((x0, [[0],[0]]))
 R = np.array([[sigma**2, 0],
               [0, sigma**2]])
 
-beta = 10
+beta = 5
 P00 = beta * R[0][0]
 P11 = 0.5**2
 P_0 = np.array([[P00, 0, 0, 0],
@@ -87,7 +87,7 @@ P_0 = np.array([[P00, 0, 0, 0],
                [0, 0, 0, P11]])
 
 # Tuned
-alphaSq = 0.00000057
+alphaSq = 2.130483477610657e-10
 
 t0 = 0
 t_prev = 0
@@ -109,13 +109,14 @@ estPos = []
 predicted_P00.append(P00)
 estimated_P00.append(P00)
 oosmStamp = []
-oosmStamp.append(0)
+oosmStamp.append(estUtils.SequenceMethod.NOOOSM)
 
 # STEP 1: Select Estimator Method
 # Define the Estimator (BASELINE, BLACKMAN3, BLACKMAN4, SIMON)
-state = estUtils.FilterMethod.BASELINE
-state = estUtils.FilterMethod.BLACKMAN3
-state = estUtils.FilterMethod.SIMON
+# state = estUtils.FilterMethod.BASELINE
+# state = estUtils.FilterMethod.BLACKMAN3
+state = estUtils.FilterMethod.BLACKMAN4
+# state = estUtils.FilterMethod.SIMON
 
 # STEP 3: Select IN SEQUENE or OUT OF SEQUENCE
 # Define the sequence method (NOOOSM, OOSM)
@@ -128,6 +129,9 @@ if (estUtils.FilterMethod.BASELINE == state):
 
 elif (estUtils.FilterMethod.BLACKMAN3 == state):
     estimator_ = bm3.BlackmanMethod3(x_0, P_0, R)
+
+elif (estUtils.FilterMethod.BLACKMAN4 == state):
+    estimator_ = bm4.BlackmanMethod4(x_0, P_0, R)
 
 elif (estUtils.FilterMethod.SIMON == state):
     estimator_ = si.Simon(x_0, P_0, R)
@@ -228,12 +232,12 @@ axs[0,0].set_title(f"NEES. Avg: {nees_u}")
 axs[0,0].legend()
 
 # Plot Estiamte Covariance Position Element
-axs[1,0].plot(estP00, label='P_00', linewidth='0.1', marker='.', color='red')
+axs[1,0].plot(estP00, label='Updated P_pos', linewidth='0.1', marker='.', color='red')
 axs[1,0].scatter(oosm_idx, estP00[oosm_idx], marker='*', color='orange', s=30, label='OOSM Frames')
-axs[1,0].plot(predP00, label='Predicted P00', linewidth='0.1', marker='.', color='blue')
+axs[1,0].plot(predP00, label='Predicted P_pos', linewidth='0.1', marker='.', color='blue')
 axs[1,0].scatter(oosm_idx, predP00[oosm_idx], marker='*', color='orange', s=30)
 axs[1,0].set_xlabel('Iterations')
-axs[1,0].set_title('Estimated P00')
+axs[1,0].set_title('Covariance P')
 axs[1,0].legend()
 
 # Plot the Signal Vs Measured Vs Estimated

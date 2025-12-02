@@ -59,7 +59,6 @@ class Simon(Estimator):
         self.oosm = oosm
 
         if (False == self.didAssociate):
-            print("DidntAssociate")
             if (True == self.oosm):
                 return
             
