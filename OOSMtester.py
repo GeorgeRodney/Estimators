@@ -8,7 +8,7 @@ import XYStepper as vid
 import Simon as si
 
 # Number of samples!
-N = 64
+N = 1e2
 
 # Process noise function
 def Q_dt(t, sigma_a):
@@ -87,7 +87,7 @@ P_0 = np.array([[P00, 0, 0, 0],
                [0, 0, 0, P11]])
 
 # Tuned
-alphaSq = 2.130483477610657e-10
+alphaSq = 2.130483477610657e-4
 
 t0 = 0
 t_prev = 0
@@ -109,7 +109,7 @@ estPos = []
 predicted_P00.append(P00)
 estimated_P00.append(P00)
 oosmStamp = []
-oosmStamp.append(estUtils.SequenceMethod.NOOOSM)
+oosmStamp.append(0)
 
 # STEP 1: Select Estimator Method
 # Define the Estimator (BASELINE, BLACKMAN3, BLACKMAN4, SIMON)
@@ -120,7 +120,7 @@ state = estUtils.FilterMethod.BLACKMAN4
 
 # STEP 3: Select IN SEQUENE or OUT OF SEQUENCE
 # Define the sequence method (NOOOSM, OOSM)
-doOOSM = estUtils.SequenceMethod.NOOOSM
+# doOOSM = estUtils.SequenceMethod.NOOOSM
 doOOSM = estUtils.SequenceMethod.OOSM
 
 # Instantiate the Estimator

@@ -51,10 +51,10 @@ class BlackmanMethod4(Estimator):
             # Expected measurement location (10.9)
             self.ye = self.He @ self.x
 
-            # Process noise covariance for time tau
+            # cross covariance of the state at time k and Q_(k0|k)
             self.Qe = ( np.eye(4) - self.K @ self.H ) @ self.Qtau
 
-            # Pe
+            # Estimated covariance at time step k minus the cross covariance of the state at time k and Q_(k0|k)
             self.Pe = self.P - self.Qe
 
             return
@@ -81,9 +81,6 @@ class BlackmanMethod4(Estimator):
             # Update the State [Mean and Covariance]
             self.x = self.x + self.K @ self.y
             self.P = ( np.eye(4) - self.K @ self.He ) @ self.P + self.K @ self.He @ self.Qe.T
-
-            # Rest oosm flag
-            self.oosm = False
 
         elif (False == self.oosm):
 

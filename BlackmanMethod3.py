@@ -28,13 +28,14 @@ class BlackmanMethod3(Estimator):
                       [0, 0, 0, 1]])
         
         self.x_ = F @ self.x
-        self.P_ = F @ self.P @ F.T + Q
 
         if (True == self.oosm):
+            self.P_ = F @ self.P @ F.T
             self.He = self.H @ F
             self.S = self.He @ self.P_ @ self.He.T + self.R
 
         elif (False == self.oosm):
+            self.P_ = F @ self.P @ F.T + Q
             self.S = self.H @ self.P_ @ self.H.T + self.R
 
     def update(self, z, oosm):
@@ -61,9 +62,6 @@ class BlackmanMethod3(Estimator):
 
             I = np.eye(self.P.shape[0])
             self.P = (I - self.K @ self.He) @ self.P_ @ (I - self.K @ self.He).T + self.K @ self.R @ self.K.T
-
-            # Rest oosm flag
-            self.oosm = False
 
         elif (False == self.oosm):
 
